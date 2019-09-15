@@ -1,0 +1,6 @@
+./run /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/set1.train.txt /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/csv_converted/set1.train.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/set1.valid.txt /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/csv_converted/set1.valid.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/set1.test.txt /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/csv_converted/set1.test.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/set2.train.txt /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/csv_converted/set2.train.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/set2.valid.txt /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/csv_converted/set2.valid.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/set2.test.txt /media/mashiur/TOURO/datasets/DecisionTree/Yahoo_LTRC/Webscope_c14B_LTRC/ltrc_yahoo/csv_converted/set2.test.csv

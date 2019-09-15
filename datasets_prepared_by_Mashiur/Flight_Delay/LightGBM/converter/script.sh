@@ -1,0 +1,3 @@
+./run /media/mashiur/TOURO/datasets/DecisionTree/Flight_Delay/2005.csv /media/mashiur/TOURO/datasets/DecisionTree/Flight_Delay/converted_csv/LightGBM/2005.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Flight_Delay/2006.csv /media/mashiur/TOURO/datasets/DecisionTree/Flight_Delay/converted_csv/LightGBM/2006.csv
+./run /media/mashiur/TOURO/datasets/DecisionTree/Flight_Delay/2007.csv /media/mashiur/TOURO/datasets/DecisionTree/Flight_Delay/converted_csv/LightGBM/2007.csv

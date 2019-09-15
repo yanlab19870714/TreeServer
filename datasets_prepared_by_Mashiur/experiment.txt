@@ -1,0 +1,108 @@
+1. XGBoost (4 datasets)
+
+(a) Allstate (n = 10M, m = 4227, Task = Insurance Claim Classification)
+
+https://www.kaggle.com/c/ClaimPredictionChallenge (Found dataset with m = 35)
+
+(b) Higgs Boson (n = 10M, m = 28, Task = Event Classification)
+
+https://archive.ics.uci.edu/ml/datasets/HIGGS
+
+(c) Yahoo LTRC (n = 473K, m = 700, Task = Learning to Rank, Classification problem)
+
+O. Chapelle and Y. Chang. Yahoo! Learning to Rank
+Challenge Overview. Journal of Machine Learning
+Research - W & CP, 14:1{24, 2011.
+
+Useful Links :
+
+https://webscope.sandbox.yahoo.com/catalog.php?datatype=c&guccounter=1
+https://course.ccs.neu.edu/cs6200sp15/extra/07_du/chapelle11a.pdf
+
+(d) Criteo (n = 1.7B, m = 67, Task = Click Through Rate Prediction)
+
+http://labs.criteo.com/downloads/download-terabyteclick-logs/
+https://labs.criteo.com/2013/12/download-terabyte-click-logs/(downloaded from here)
+https://labs.criteo.com/2013/12/download-terabyte-click-logs-2/(attribute description)
+
+2. LightGBM (5 datasets)
+
+(a) Microsoft Learning to Rank (LETOR)[26]
+Tao Qin and Tie-Yan Liu. Introducing LETOR 4.0 datasets. CoRR, abs/1306.2597, 2013.
+
+(b) Allstate Insurance Claim[27]
+Allstate claim data, https://www.kaggle.com/c/ClaimPredictionChallenge.
+
+(c) The Flight Delay[28]
+Flight delay data, https://github.com/szilard/benchm-ml#data.
+
+(data available from 1987-2008)
+
+http://stat-computing.org/dataexpo/2009/2005.csv.bz2
+http://stat-computing.org/dataexpo/2009/2006.csv.bz2
+http://stat-computing.org/dataexpo/2009/2007.csv.bz2
+
+(d) KDD CUP 2010 (NTU[29, 30, 31])
+
+[29] Hsiang-Fu Yu, Hung-Yi Lo, Hsun-Ping Hsieh, Jing-Kai Lou, Todd G McKenzie, Jung-Wei Chou, Po-Han Chung, Chia-Hua Ho, Chun-Fu
+Chang, Yin-Hsuan Wei, et al. Feature engineering and classifier ensemble for kdd cup 2010. In KDD Cup, 2010.
+
+[30] Kuan-Wei Wu, Chun-Sung Ferng, Chia-Hua Ho, An-Chun Liang, Chun-Heng Huang, Wei-Yuan Shen, Jyun-Yu Jiang, Ming-Hao Yang,
+Ting-Wei Lin, Ching-Pei Lee, et al. A two-stage ensemble of diverse models for advertisement ranking in kdd cup 2012. In KDDCup,
+2012.
+
+[31] Libsvm binary classification data, https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html.
+
+(e) KDD CUP 2012 (NTU[29, 30, 31])
+
+[29] Hsiang-Fu Yu, Hung-Yi Lo, Hsun-Ping Hsieh, Jing-Kai Lou, Todd G McKenzie, Jung-Wei Chou, Po-Han Chung, Chia-Hua Ho, Chun-Fu
+Chang, Yin-Hsuan Wei, et al. Feature engineering and classifier ensemble for kdd cup 2010. In KDD Cup, 2010.
+
+[30] Kuan-Wei Wu, Chun-Sung Ferng, Chia-Hua Ho, An-Chun Liang, Chun-Heng Huang, Wei-Yuan Shen, Jyun-Yu Jiang, Ming-Hao Yang,
+Ting-Wei Lin, Ching-Pei Lee, et al. A two-stage ensemble of diverse models for advertisement ranking in kdd cup 2012. In KDDCup,
+2012.
+
+[31] Libsvm binary classification data, https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary.html.
+
+3. google planet [1 dataset]
+
+(a) Bounce Rate Prediction Problem [See the Description in Paper]
+
+[22] A. Kaushik. Bounce rate as sexiest web metric ever.
+MarketingProfs, August 2007.
+http://www.marketingprofs.com/7/bounce-ratesexiest-web-metric-ever-kaushik.asp?sp=1.
+
+[23] A. Kaushik. Excellent analytics tip 11: Measure
+effectiveness of your web pages. Occam’s Razor (blog),
+May 2007.
+http://www.kaushik.net/avinash/2007/05/excellentanalytics-tip-11-measure-effectiveness-of-your-webpages.html.
+
+4. PV-Tree [A Communication-Efficient Parallel Algorithm for Decision Tree] (2 datasets)
+
+- We used two data sets, one for learning to rank (LTR) and the other for ad click prediction (CTR)8
+(see Table 1 for details).
+
+- We use private data in LTR experiments and data of KDD Cup 2012 track 2 in CTR experiments.
+
+5.  Multi-Layer Gradient Boosting
+
+- Income Prediction Dataset [M. Lichman. UCI machine learning repository, 2013]
+
+http://archive.ics.uci.edu/ml/datasets/Adult (may be)
+
+
+##################################################################################################3
+
+Paper List
+
+(1) XGBoost [https://www.kdd.org/kdd2016/papers/files/rfp0697-chenAemb.pdf]
+(2) LightGBM [https://papers.nips.cc/paper/6907-lightgbm-a-highly-efficient-gradient-boosting-decision-tree.pdf]
+(3) PLANET [https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/36296.pdf]
+(4) iForest [https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/icdm08b.pdf?q=isolation-forest]
+(5) Deep Forest [https://www.ijcai.org/proceedings/2017/0497.pdf]
+(6) SENC Forest [https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/tkde17sencForest.pdf]
+(7) eForest (AutoEncoder By Forest) [https://arxiv.org/pdf/1709.09018.pdf]
+(8) Multi Layered Gradient Boosting Decision Trees [https://papers.nips.cc/paper/7614-multi-layered-gradient-boosting-decision-trees.pdf]
+(9) PV-Tree (A Communication-Efficient Parallel Algorithm for Decision Tree) [https://arxiv.org/pdf/1611.01276.pdf]
+(10) McRank [https://papers.nips.cc/paper/3270-mcrank-learning-to-rank-using-multiple-classification-and-gradient-boosting.pdf]
+(11) NeC4.5 [http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.1.8430&rep=rep1&type=pdf]

@@ -1,0 +1,11 @@
+2147483647 # MAX_TREE_DEPTH: INT_MAX = 2147483647 by default
+10 # BRUTE_FORCE_MAX_ITEM: 10 by default, better not too big
+11 # IMPURITY_FUNC: choose from:
+# IMPURITY_ENTROPY = 8
+# IMPURITY_GINI = 9
+# IMPURITY_CLASSIFICATION_ERROR = 10
+# IMPURITY_VARIANCE = 11
+dataset/breiman/regression/split_forest/train0 #training data
+dataset/breiman/regression/split_forest/test0 #test data
+dataset/breiman/regression/split_forest/meta.csv #meta data
+12 # which column is y?

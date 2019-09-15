@@ -1,0 +1,7 @@
+sunny,hot,high,true,0
+overcast,cool,normal,true,1
+rainy,mild,normal,false,1
+rainy,mild,high,false,1
+sunny,mild,high,false,0
+sunny,cool,normal,false,1
+overcast,hot,high,false,1
