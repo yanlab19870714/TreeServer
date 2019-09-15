@@ -53,9 +53,9 @@ Input File Checklist :
 #################################################
 
 * On HDFS (needed by all workers):
-[job_config]
-[train_file_on_hdfs]
-[meta_file_on_hdfs]
+[job_config] (upload using hadoop fs -put)
+[train_file_on_hdfs] (upload using our put cpp program)
+[meta_file_on_hdfs] (upload using hadoop fs -put)
 
 * Local to Master:
 [tree_config]
