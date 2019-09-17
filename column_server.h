@@ -26,8 +26,6 @@
 #include "csv.h"
 #include "ydhdfs.h"
 
-#include <fstream>
-
 using namespace std;
 
 class ColumnServer { //one "whole column" of (1) a data table or (2) its partition (subset)
