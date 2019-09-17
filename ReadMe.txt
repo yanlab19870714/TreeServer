@@ -44,9 +44,11 @@ mpiexec -n 3 ./run job.config data/tree2.config data/bank_test.csv data/bank_met
 
 (note that test-metafile could be different from training-metafile, as the y-column may be missing)
 
-3. In "config.h", you can switch on the following to print and save the output trees
-bool SAVE_TREE = true
+3. In "config.h", you can switch on the following to print the output trees
 bool PRINT_TREE = false; // -> true
+
+Note that SAVE_TREE and NO_WARNING are set by job.config
+
 
 #################################################
 Input File Checklist :
