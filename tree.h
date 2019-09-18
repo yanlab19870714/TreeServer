@@ -243,6 +243,7 @@ void print_internal_node_content(SplitResult* result, vector<size_t>::iterator &
 // this function is to decide when to stop splitting given [start, end)
 // param: start_iterator, end_iterator (exclusive), Column Y
 // output: stop ?
+// leaf_label is an output: majority label
 template <class T>
 bool stop_splitting_categorical(Matrix & dataset, vector<size_t>::iterator start, vector<size_t>::iterator end,
                     TreeConfig &treeConfig, T &leaf_label) { // checking whether all Y_values are same
@@ -279,6 +280,7 @@ bool stop_splitting_categorical(Matrix & dataset, vector<size_t>::iterator start
     return freq.size() == treeConfig.MIN_SAMPLE_LEAF; // stop splitting if there is only 1 item in Y[start, end)
 }
 
+// leaf_label is an output: average Y-value
 template <class T>
 bool stop_splitting_ordinal(Matrix & dataset, vector<size_t>::iterator start, vector<size_t>::iterator end,
                     TreeConfig & treeConfig, T & leaf_label) { // checking whether all Y_values are same
