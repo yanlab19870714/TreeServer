@@ -1,25 +1,3 @@
-//########################################################################
-//## Copyright 2019 Da Yan http://www.cs.uab.edu/yanda
-//##
-//## Licensed under the Apache License, Version 2.0 (the "License");
-//## you may not use this file except in compliance with the License.
-//## You may obtain a copy of the License at
-//##
-//## //http://www.apache.org/licenses/LICENSE-2.0
-//##
-//## Unless required by applicable law or agreed to in writing, software
-//## distributed under the License is distributed on an "AS IS" BASIS,
-//## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//## See the License for the specific language governing permissions and
-//## limitations under the License.
-//########################################################################
-
-//########################################################################
-//## Contributors
-//## CHOWDHURY, Md Mashiur Rahman    (Mashiur)
-//## YAN, Da    (Daniel)
-//########################################################################
-
 #ifndef TREE_H
 #define TREE_H
 
@@ -243,7 +221,7 @@ void print_internal_node_content(SplitResult* result, vector<size_t>::iterator &
 // this function is to decide when to stop splitting given [start, end)
 // param: start_iterator, end_iterator (exclusive), Column Y
 // output: stop ?
-// leaf_label is an output: majority label
+// leaf_label is an output: majority of y-label among [start, end)
 template <class T>
 bool stop_splitting_categorical(Matrix & dataset, vector<size_t>::iterator start, vector<size_t>::iterator end,
                     TreeConfig &treeConfig, T &leaf_label) { // checking whether all Y_values are same
@@ -277,10 +255,13 @@ bool stop_splitting_categorical(Matrix & dataset, vector<size_t>::iterator start
         }
     }
 
-    return freq.size() == treeConfig.MIN_SAMPLE_LEAF; // stop splitting if there is only 1 item in Y[start, end)
+    bool min_node = ((end - start) <= treeConfig.MIN_SAMPLE_LEAF); //whether node is too small to split
+    bool sameY = (freq.size() == 1);
+
+    return min_node || sameY; // stop splitting if there is only 1 item in Y[start, end)
 }
 
-// leaf_label is an output: average Y-value
+// leaf_label is an output: average of y-value among [start, end)
 template <class T>
 bool stop_splitting_ordinal(Matrix & dataset, vector<size_t>::iterator start, vector<size_t>::iterator end,
                     TreeConfig & treeConfig, T & leaf_label) { // checking whether all Y_values are same
@@ -297,7 +278,8 @@ bool stop_splitting_ordinal(Matrix & dataset, vector<size_t>::iterator start, ve
     average = average / (end - start);
     leaf_label = average;
 
-    return (end - start) == treeConfig.MIN_SAMPLE_LEAF;
+    bool min_node = ((end - start) <= treeConfig.MIN_SAMPLE_LEAF); //whether node is too small to split
+    return min_node;
 }
 
 template <class T>
