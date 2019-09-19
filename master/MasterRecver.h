@@ -71,6 +71,9 @@ void random_shuffle(int k, vector<int> & result) {
     for(int index = 0; index < k; index++) {
         int random_pos = index + (rand() % (num_columns - index));
         std::swap(all_columns[index], all_columns[random_pos]);
+    }
+
+    for(int index = 0; index < k; index++) {
         result.push_back(all_columns[index]);
     }
 
