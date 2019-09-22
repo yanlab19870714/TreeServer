@@ -163,6 +163,7 @@ void load_meta(const char* metafile, Matrix &X) {
     //------
     while(fin.getline(line, 10000))
     {
+    	if(strlen(line) == 0) continue; //last line could be empty
         if(line[0] == '#') continue; //skip lines starting with '#'
         prev = line; //tokenizer: move to line head
         //============== read in field 1 data_type ==============

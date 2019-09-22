@@ -49,6 +49,7 @@ public:
 			if (!reader.eof())
 			{
 				char * line = reader.getLine();
+				if(strlen(line) == 0) continue; //last line could be empty
 				if(line[0] == '#') continue; //skip lines starting with '#'
 				prev = line; //tokenizer: move to line head
 				//============== read in field 1 data_type ==============
@@ -237,10 +238,7 @@ public:
 		hdfsCloseFile(fs, in);
 		hdfsDisconnect(fs);
 		//------
-		vector<Column*> & columns = X.col;
-		for(size_t i=0; i<columns.size(); i++)
-			if(columns[i]->is_dense == false)
-				columns[i]->finish(row_idx);
+		if(column->is_dense == false) column->finish(row_idx);
 	}
 
 };

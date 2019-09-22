@@ -37,6 +37,8 @@ using namespace std;
 //arg4: local job-config path
 
 int main(int argc, char** argv){
+	PRINT_TREE = true;
+
     if(argc != 6)
     {
     	cout<<"arg1: local file path for a forest model"<<endl;
@@ -66,7 +68,7 @@ int main(int argc, char** argv){
 
 		if(PRINT_TREE) {
 			cout << "##################################################" << endl;
-			print_tree(rootList[root_idx], 0, "");
+			print_tree(rootList[root_idx], test_set);
 			cout << endl << endl;
 		}
 		free_tree(rootList[root_idx], y_index, test_set);

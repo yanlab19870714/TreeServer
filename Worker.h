@@ -1092,7 +1092,7 @@ public:
 						cout << endl;
 
 						cout << "##################################################" << endl;
-						print_tree(rootList[root_idx], 0, "");
+						print_tree(rootList[root_idx]);
 						cout << endl << endl;
 					}
 

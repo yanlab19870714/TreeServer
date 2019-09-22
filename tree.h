@@ -29,9 +29,6 @@
 #include <ctime>
 #include "ioser.h"
 
-void free_tree(TreeNode* root);
-void print_tree(TreeNode* root, int tree_depth);
-
 //////////////////// used by both Task_Slave, Task_Master /////////////////
 
 template <class T>
@@ -833,7 +830,7 @@ void print_categorical_node(TreeNode* root) {
 // printing the tree starting from root to each leaf
 // recursive function called repeatedly until the end
 // param  : TreeNode* root, Matrix& dataset and output_col_index
-void print_tree(TreeNode* root, int tree_depth, string indent, bool last = true) {
+void print_tree(TreeNode* root, int tree_depth = 0, string indent = "", bool last = true) {
     size_t sample_size = root->size;
 
     cout << indent << "+-";
@@ -928,6 +925,106 @@ void print_tree(TreeNode* root, int tree_depth, string indent, bool last = true)
         tree_depth++;
         print_tree(root->left, tree_depth, indent, false);
         print_tree(root->right, tree_depth, indent, true);
+    }
+}
+
+// printing the tree starting from root to each leaf
+// recursive function called repeatedly until the end
+// param  : TreeNode* root, Matrix& dataset and output_col_index
+void print_tree(TreeNode* root, Matrix & X, int tree_depth = 0, string indent = "", bool last = true) {
+    size_t sample_size = root->size;
+
+    cout << indent << "+-";
+
+    indent += last ? "   " : "|  ";
+
+    if(root->column_index == -1) {
+        Column* Y = X.get_column(y_index);
+
+        if(Y->data_type == ELEM_BOOL) {
+            LeafNode<bool>* leaf_node = (LeafNode<bool>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else if(Y->data_type == ELEM_SHORT) {
+            LeafNode<short>* leaf_node = (LeafNode<short>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else if(Y->data_type == ELEM_INT) {
+            LeafNode<int>* leaf_node = (LeafNode<int>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else if(Y->data_type == ELEM_FLOAT) {
+            LeafNode<float>* leaf_node = (LeafNode<float>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else if(Y->data_type == ELEM_DOUBLE) {
+            LeafNode<double>* leaf_node = (LeafNode<double>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else if(Y->data_type == ELEM_CHAR) {
+            LeafNode<char>* leaf_node = (LeafNode<char>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else if(Y->data_type == ELEM_STRING) {
+            LeafNode<string>* leaf_node = (LeafNode<string>*) root;
+            cout<<"Leaf: label=" << leaf_node->label;
+        } else {
+            cout<< "[ERROR] Unknown Attribute(y) of type " << Y->data_type << endl;
+            exit(-1);
+        }
+        cout<< endl;
+    } else { // regular node other than leaf
+        cout<<"Internal: X["<<(root->column_index)<<"]";
+
+        Column* Xi = X.get_column(root->column_index);
+
+        if(Xi->is_ordinal) {
+            if(Xi->data_type == ELEM_BOOL) {
+                OrdinalTreeNode<bool>* ordinalTreeNode = (OrdinalTreeNode<bool>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else if(Xi->data_type == ELEM_SHORT) {
+                OrdinalTreeNode<short>* ordinalTreeNode = (OrdinalTreeNode<short>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else if(Xi->data_type == ELEM_INT) {
+                OrdinalTreeNode<int>* ordinalTreeNode = (OrdinalTreeNode<int>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else if(Xi->data_type == ELEM_FLOAT) {
+                OrdinalTreeNode<float>* ordinalTreeNode = (OrdinalTreeNode<float>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else if(Xi->data_type == ELEM_DOUBLE) {
+                OrdinalTreeNode<double>* ordinalTreeNode = (OrdinalTreeNode<double>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else if(Xi->data_type == ELEM_CHAR) {
+                OrdinalTreeNode<char>* ordinalTreeNode = (OrdinalTreeNode<char>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else if(Xi->data_type == ELEM_STRING) {
+                OrdinalTreeNode<string>* ordinalTreeNode = (OrdinalTreeNode<string>*) root;
+                cout<< "<" << ordinalTreeNode->split_value << ", freq_y = " << ordinalTreeNode->label;
+            } else {
+                cout << "File = " << __FILE__ << ", Line = " << __LINE__ << "[ERROR] Unknown Attribute(Xi) of type " << Xi->data_type << endl;
+                exit(-1);
+            }
+        } else {
+
+            if(Xi->data_type == ELEM_BOOL) {
+                print_categorical_node<bool>(root);
+            } else if(Xi->data_type == ELEM_SHORT) {
+                print_categorical_node<short>(root);
+            } else if(Xi->data_type == ELEM_INT) {
+                print_categorical_node<int>(root);
+            } else if(Xi->data_type == ELEM_FLOAT) {
+                print_categorical_node<float>(root);
+            } else if(Xi->data_type == ELEM_DOUBLE) {
+                print_categorical_node<double>(root);
+            } else if(Xi->data_type == ELEM_CHAR) {
+                print_categorical_node<char>(root);
+            } else if(Xi->data_type == ELEM_STRING) {
+                print_categorical_node<string>(root);
+            } else {
+                cout << "File = " << __FILE__ << ", Line = " << __LINE__ << "[ERROR] Unknown Attribute(Xi) of type " << Xi->data_type << endl;
+                exit(-1);
+            }
+
+        }
+
+        cout<< endl;
+        tree_depth++;
+        print_tree(root->left, X, tree_depth, indent, false);
+        print_tree(root->right, X, tree_depth, indent, true);
     }
 }
 
