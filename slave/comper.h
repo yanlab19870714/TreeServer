@@ -221,7 +221,7 @@ public:
 
             Column* Y = cserver.X.get_column(y_index);
             vector<size_t> & rows = subtree_task->candidate_rows.indexes;
-            subtree_task->root = create_leaf_wrappper(Y, rows.begin(), rows.end(), subtree_task->candidate_rows.freq_y);
+            subtree_task->root = create_leaf_wrapper(Y, rows.begin(), rows.end(), subtree_task->candidate_rows.freq_y);
 
             resp->root = subtree_task->root;
             ready_buffer.enqueue(resp);

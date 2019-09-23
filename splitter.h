@@ -593,13 +593,11 @@ void set_best_pos_classification(vector<id_value<Tx, Ty>> &pairs, Best &current,
 
     set_sketch<Tx, Ty>(right, pairs);
 
-    double prev = -DBL_MAX;
-
     for (size_t i = 0; i < pairs.size() - 1; i++) {
         id_value<Tx, Ty> &pair = pairs[i];
         update_sketches<Ty>(left, right, pair.y_value); //update with the current element
 
-        if(i !=  0 && prev + FEATURE_THRESHOLD >= pair.x_value) {
+        if(pairs[i+1].x_value == pair.x_value) {
             continue;
         }
 
@@ -632,8 +630,6 @@ void set_best_pos_classification(vector<id_value<Tx, Ty>> &pairs, Best &current,
             current.impurity_improvement = impurity_improvement;
             current.offset = i; // (it - start) ==  (i - 0)
         }
-
-        prev = pair.x_value;
     }
 
 }
@@ -660,13 +656,11 @@ void set_best_pos_regression(vector<id_value<Tx, Ty>> &pairs, Best &current) {
 
     set_sketch<Tx, Ty>(right, pairs);
 
-    double prev = -DBL_MAX;
-
     for (size_t i = 0; i < pairs.size() - 1; i++) {
         id_value<Tx, Ty> &pair = pairs[i];
         update_sketches<Ty>(left, right, pair.y_value); //update with the current element
 
-        if(i != 0 && prev + FEATURE_THRESHOLD >= pair.x_value) {
+        if(pairs[i+1].x_value == pair.x_value) {
             continue;
         }
 
@@ -679,8 +673,6 @@ void set_best_pos_regression(vector<id_value<Tx, Ty>> &pairs, Best &current) {
             current.impurity_improvement = impurity_improvement;
             current.offset = i; //like (it - start) == (i - 0);
         }
-
-        prev = pair.x_value;
     }
 
 }

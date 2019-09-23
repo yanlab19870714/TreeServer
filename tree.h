@@ -313,7 +313,7 @@ TreeNode* create_leaf(vector<size_t>::iterator start, vector<size_t>::iterator e
     return node;
 }
 
-TreeNode* create_leaf_wrappper(Column* Y, vector<size_t>::iterator start,
+TreeNode* create_leaf_wrapper(Column* Y, vector<size_t>::iterator start,
                                vector<size_t>::iterator end, string label) {
     int y_type = Y->data_type;
 
@@ -472,7 +472,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
     SplitResult* result = node_split(*task->matrix, start, end, cols, treeConfig); //sort [start, end) by the best Xi
 
     if(result->column_idx == -2) {
-        TreeNode* leaf_node = create_leaf_wrappper(Y, start, end, node_label);
+        TreeNode* leaf_node = create_leaf_wrapper(Y, start, end, node_label);
         return leaf_node;
     }
 
@@ -699,7 +699,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
     // print_internal_node_content(result, start, end, train_set, y_index); //###### debug ######
 
     if(result->column_idx == -2) {
-        TreeNode* leaf_node = create_leaf_wrappper(Y, start, end, node_label);
+        TreeNode* leaf_node = create_leaf_wrapper(Y, start, end, node_label);
         return leaf_node;
     }
 
