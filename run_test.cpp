@@ -46,7 +46,7 @@ int main(int argc, char** argv){
     	cout<<"arg3: local metafile path"<<endl;
     	cout<<"arg4: local job-config path (for y_index)"<<endl;
     	cout<<"arg5: is_classification? (0/1)"<<endl;
-    	return;
+    	return -1;
     }
 
     Matrix test_set;
