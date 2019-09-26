@@ -529,11 +529,11 @@ public:
         int total_parent_request = treeConfig.n_columns * 2;
 
         if(task_split->level < treeConfig.MAX_TREE_DEPTH - 1) {
-            if(task_best_split->left_D < subtree_D && task_best_split->left_D > treeConfig.MIN_SAMPLE_LEAF) {
+            if(treeConfig.sample_col_each_node == false && task_best_split->left_D < subtree_D && task_best_split->left_D > treeConfig.MIN_SAMPLE_LEAF) {
                 total_parent_request++;
             }
 
-            if(task_best_split->right_D < subtree_D && task_best_split->right_D > treeConfig.MIN_SAMPLE_LEAF) {
+            if(treeConfig.sample_col_each_node == false && task_best_split->right_D < subtree_D && task_best_split->right_D > treeConfig.MIN_SAMPLE_LEAF) {
                 total_parent_request++;
             }
         }
@@ -617,7 +617,7 @@ public:
                 plan_buffer.push_back(left_leaf_plan);
             }
 
-        } else if (task_best_split->left_D < subtree_D) { // left subtree plan
+        } else if (treeConfig.sample_col_each_node == false && task_best_split->left_D < subtree_D) { // left subtree plan
 
             // --- subtree plan as left child, one left-plan
             int new_task_id = ++task_id_counter;
@@ -689,7 +689,7 @@ public:
                 plan_buffer.push_back(right_leaf_plan);
             }
 
-        } else if (task_best_split->right_D < subtree_D) { // right subtree plan
+        } else if (treeConfig.sample_col_each_node == false && task_best_split->right_D < subtree_D) { // right subtree plan
 
             // --- subtree plan as right child, one right-plan
             int new_task_id = ++task_id_counter;

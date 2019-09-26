@@ -299,7 +299,7 @@ public:
 	}
 
     // creating or updating task object (for this plan) in master-task-table
-    // note that a task may generate may cplans
+    // note that a task may generate many cplans
     // updating means to append slaveID for tracking response progress
 	void update_task_master(plan* tree_plan, conmap2t<int, Task_Master*> & task_table,
 							PlanQueue & planQueue) { //tree_plan rename to the_plan
@@ -452,7 +452,7 @@ public:
 #endif
 
                 // creating or updating task object (for this plan) in master-task-table
-                // note that a task may generate may cplans
+                // note that a task may generate many cplans
                 // updating means to append slaveID for tracking response progress
                 update_task_master(temp_plan, task_table, planQueue);
 
