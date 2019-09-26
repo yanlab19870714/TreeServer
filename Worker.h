@@ -146,34 +146,69 @@ public:
 	void create_root_subtree_plans(queue<plan*> & root_plan_buffer, vector<TreeConfig> & configList) {
 
 		for(size_t index = 0; index < configList.size(); index++) {
+
 			TreeConfig & treeConfig = configList[index];
 
-			if(treeConfig.type == DECISION_TREE) {
-				TreeConfig p_config;
-				set_config(treeConfig, p_config, 0);
-
-				subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[0],
-																  treeConfig.column_distribution[0]);
-				subtreePlan->root_task_id = subtreePlan->task_id;
-
-				root_plan_buffer.push(subtreePlan);
-
-			} else if (treeConfig.type == RANDOM_FOREST) {
-				int n_plans = treeConfig.column_distribution.size();
-
-				for(int k = 0; k < n_plans; k++) {
+			if(treeConfig.sample_col_each_node == false)
+			{
+				if(treeConfig.type == DECISION_TREE) {
 					TreeConfig p_config;
-					set_config(treeConfig, p_config, k);
+					set_config(treeConfig, p_config, 0);
 
-					subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[k],
-																	  treeConfig.column_distribution[k]);
+					subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[0],
+																	  treeConfig.column_distribution[0]);
 					subtreePlan->root_task_id = subtreePlan->task_id;
 
 					root_plan_buffer.push(subtreePlan);
+
+				} else if (treeConfig.type == RANDOM_FOREST) {
+					int n_plans = treeConfig.column_distribution.size();
+
+					for(int k = 0; k < n_plans; k++) {
+						TreeConfig p_config;
+						set_config(treeConfig, p_config, k);
+
+						subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[k],
+																		  treeConfig.column_distribution[k]);
+						subtreePlan->root_task_id = subtreePlan->task_id;
+
+						root_plan_buffer.push(subtreePlan);
+					}
+				} else {
+					cout << "ERROR: wrong type, File = " << __FILE__ << ", Line = " << __LINE__ << endl;
+					exit(-1);
 				}
-			} else {
-				cout << "ERROR: wrong type, File = " << __FILE__ << ", Line = " << __LINE__ << endl;
-				exit(-1);
+			}
+			else
+			{
+				if(treeConfig.type == DECISION_TREE) {
+					TreeConfig p_config;
+					set_config(treeConfig, p_config, 0);
+
+					column_split_plan* empty_plan = create_empty_plan(p_config, treeConfig.rootList[0],
+																	  treeConfig.column_distribution[0]);
+					empty_plan->root_task_id = empty_plan->task_id;
+
+					root_plan_buffer.push(empty_plan);
+
+				} else if (treeConfig.type == RANDOM_FOREST) {
+					int n_plans = treeConfig.column_distribution.size();
+
+					for(int k = 0; k < n_plans; k++) {
+						TreeConfig p_config;
+						set_config(treeConfig, p_config, k);
+
+						column_split_plan* empty_plan = create_empty_plan(p_config, treeConfig.rootList[k],
+																		  treeConfig.column_distribution[k]);
+						empty_plan->root_task_id = empty_plan->task_id;
+
+						root_plan_buffer.push(empty_plan);
+					}
+				} else {
+					cout << "ERROR: wrong type, type found = " << treeConfig.type << " File = " << __FILE__
+						 << ", Line = " << __LINE__ << endl;
+					exit(-1);
+				}
 			}
 		}
 	}
