@@ -954,8 +954,6 @@ public:
 						assert(num_columns > 0);
 					}
 
-					cout<<"num_columns = "<< num_columns <<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
 					for (int tree_index = 0; tree_index < config.num_trees;
 							tree_index++) {
 						//config.column_distribution[tree_index].clear();

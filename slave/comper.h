@@ -573,8 +573,6 @@ public:
             while (task_slave != NULL) {
                 sth_found = true;
 
-                cout<<"in comper::run(), task_slave->tree_config.type = "<<task_slave->tree_config.type<<endl;//@@@@@@@@@@@@@@@@@@@@@@@
-
                 if(task_slave->task_type == TASK_SUB_TREE) {
                     build_subtree(task_slave);
                 } else if (task_slave->task_type == TASK_COL_SPLIT) {

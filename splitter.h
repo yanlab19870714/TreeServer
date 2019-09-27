@@ -1749,7 +1749,6 @@ void update_random_split_ordinal_classification(Matrix &dataset, vector<size_t>:
 // =========== newly added for ExtraTrees ==========
 void find_random_split_column(Matrix & dataset, vector<size_t>::iterator start, Best & current,
                             Best & best, TreeConfig & treeConfig) {
-	cout<<"CALLED !!!"<<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	Column* Xi = dataset.get_column(current.column_idx);
 	Column* y = dataset.get_column(y_index);
 	if(Xi->is_ordinal)
@@ -1909,16 +1908,12 @@ SplitResult* node_split(Matrix & dataset, vector<size_t>::iterator start, vector
 
     Best best;
 
-    cout<<"in node_split, cols.size() = "<<cols.size()<<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
     for(size_t col_idx = 0; col_idx < cols.size(); col_idx++) {
         if(cols[col_idx] == y_index) continue; // skipping target_column from splitting
 
         Best current;
         current.column_idx = cols[col_idx];
         current.end = end;
-
-        cout<<"treeConfig.type = "<<treeConfig.type<<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
         if(treeConfig.type == EXTRA_TREES) find_random_split_column(dataset, start, current, best, treeConfig);
         else find_best_split_column(dataset, start, current, best, treeConfig);
