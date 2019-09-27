@@ -498,6 +498,7 @@ public:
         vector<size_t> & rows = task->candidate_rows.indexes;
 
         TreeConfig & treeConfig = task->tree_config;
+
         vector<size_t>::iterator start = rows.begin();
         vector<size_t>::iterator end = rows.end();
 
@@ -571,6 +572,8 @@ public:
 
             while (task_slave != NULL) {
                 sth_found = true;
+
+                cout<<"in comper::run(), task_slave->tree_config.type = "<<task_slave->tree_config.type<<endl;//@@@@@@@@@@@@@@@@@@@@@@@
 
                 if(task_slave->task_type == TASK_SUB_TREE) {
                     build_subtree(task_slave);

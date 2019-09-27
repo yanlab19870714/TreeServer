@@ -573,6 +573,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
     }
 }
 
+/* //deprecated
 TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, vector<size_t>::iterator end,
                      vector<int> & cols,
                      int tree_depth, vector<char> & progress, TreeConfig &treeConfig) { //with progress report
@@ -813,6 +814,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
         return curNode;
     }
 }
+*/
 
 template<class T>
 void print_categorical_node(TreeNode* root) {

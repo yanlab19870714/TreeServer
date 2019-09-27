@@ -161,7 +161,7 @@ public:
 
 					root_plan_buffer.push(subtreePlan);
 
-				} else if (treeConfig.type == RANDOM_FOREST) {
+				} else if (treeConfig.type == RANDOM_FOREST || treeConfig.type == EXTRA_TREES) {
 					int n_plans = treeConfig.column_distribution.size();
 
 					for(int k = 0; k < n_plans; k++) {
@@ -191,7 +191,7 @@ public:
 
 					root_plan_buffer.push(empty_plan);
 
-				} else if (treeConfig.type == RANDOM_FOREST) {
+				} else if (treeConfig.type == RANDOM_FOREST || treeConfig.type == EXTRA_TREES) {
 					int n_plans = treeConfig.column_distribution.size();
 
 					for(int k = 0; k < n_plans; k++) {
@@ -248,7 +248,7 @@ public:
                 root_plan_buffer.push(empty_plan);
 
 
-			} else if (treeConfig.type == RANDOM_FOREST) {
+			} else if (treeConfig.type == RANDOM_FOREST || treeConfig.type == EXTRA_TREES) {
 				int n_plans = treeConfig.column_distribution.size();
 
 				for(int k = 0; k < n_plans; k++) {
@@ -490,7 +490,6 @@ public:
                 // note that a task may generate many cplans
                 // updating means to append slaveID for tracking response progress
                 update_task_master(temp_plan, task_table, planQueue);
-
 			}
 
 			temp_plan = plan_buffer.pop_front();
@@ -939,17 +938,30 @@ public:
 
 					config.column_distribution[0] = all_columns;
 
-				} else if (config.type == RANDOM_FOREST) {
+				} else if (config.type == RANDOM_FOREST || config.type == EXTRA_TREES) {
+					config.column_distribution.resize(config.num_trees);
+					config.rootList.resize(config.num_trees);
 
-                    config.column_distribution.resize(config.num_trees);
-                    config.rootList.resize(config.num_trees);
+					int num_columns;
 
-                    int num_columns = (_num_columns - 1) * config.column_sample; //number of sampled columns
+					if(config.column_sample == 0) { // default setting with sqrt(_num_columns - 1)
+						num_columns = sqrt(_num_columns - 1);
+					} else if (config.column_sample < 0) {
+						num_columns = - config.column_sample;
+						assert(num_columns < _num_columns);
+					} else { // still a ratio
+						num_columns = (_num_columns - 1) * config.column_sample;
+						assert(num_columns > 0);
+					}
 
-                    for(int tree_index = 0; tree_index < config.num_trees; tree_index++) {
-                    	//config.column_distribution[tree_index].clear();
-                        random_shuffle(num_columns, config.column_distribution[tree_index]);
-                    }
+					cout<<"num_columns = "<< num_columns <<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+					for (int tree_index = 0; tree_index < config.num_trees;
+							tree_index++) {
+						//config.column_distribution[tree_index].clear();
+						random_shuffle(num_columns,
+								config.column_distribution[tree_index]);
+					}
 
 				} else {
 					cout << "ERROR : Wrong type, type = " << config.type << ", File " << __FILE__

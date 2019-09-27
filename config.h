@@ -32,6 +32,7 @@ using namespace std;
 
 const string DECISION_TREE = "DT";
 const string RANDOM_FOREST = "RF";
+const string EXTRA_TREES = "ET";
 
 //the configurations for a tree to be built
 //(a job can build many trees with different hyperparameters)
@@ -86,6 +87,26 @@ public:
     vector<TreeNode*> rootList;
     Matrix test_set;
 };
+
+ibinstream & operator<<(ibinstream & m, const TreeConfig & treeConfig) {
+	m << treeConfig.type;
+    m << treeConfig.IMPURITY_FUNC;
+    m << treeConfig.MAX_TREE_DEPTH;
+    m << treeConfig.MIN_SAMPLE_LEAF;
+    m << treeConfig.n_columns;
+
+    return m;
+}
+
+obinstream & operator>>(obinstream & m, TreeConfig & treeConfig) {
+	m >> treeConfig.type;
+    m >> treeConfig.IMPURITY_FUNC;
+    m >> treeConfig.MAX_TREE_DEPTH;
+    m >> treeConfig.MIN_SAMPLE_LEAF;
+    m >> treeConfig.n_columns;
+
+    return m;
+}
 
 void set_config(TreeConfig src, TreeConfig & dest, int tree_index) { // for serialization
     dest.type = src.type;
@@ -318,7 +339,7 @@ void load_config(const char* tree_config_fname, vector<TreeConfig> &configList) 
 #endif
 
 
-        if(t_config.type == RANDOM_FOREST) {
+        if(t_config.type == RANDOM_FOREST || t_config.type == EXTRA_TREES) {
             //# get sample_percentage
             getline(fin, line);
             while(line.length() == 0 || line[0] == '#') getline(fin, line); // skip blank lines or lines starting with #

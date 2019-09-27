@@ -29,6 +29,7 @@
 #include <typeinfo>
 #include <mutex>
 #include <thread>
+#include <random>
 
 using namespace std;
 
@@ -801,8 +802,144 @@ SplitResult* create_split_result(Matrix & dataset, vector<size_t>::iterator star
         ordinalSplitResult->best_impurity = best.impurity_improvement;
 
         // split_value (0 + offset + 1)
-        ordinalSplitResult->attribute_value =
-            boost::lexical_cast<Tx>(pairs[best.offset + 1].x_value);
+        ordinalSplitResult->attribute_value = boost::lexical_cast<Tx>(pairs[best.offset + 1].x_value);
+
+        return ordinalSplitResult;
+    } else if (Y->is_ordinal) { // breiman's algorithm Xi categorical, Y ordinal (continuous)
+#ifdef ASSERT
+        assert(category_items.size() > 0);
+#endif
+
+        CategoricalSplitResult<Tx>* splitResult = new CategoricalSplitResult<Tx>();
+        splitResult->pos = start + best.offset;
+        splitResult->column_idx = best.column_idx;
+        splitResult->best_impurity = best.impurity_improvement;
+
+        for(size_t i = 0; i < best.S1.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(category_items[best.S1[i]].category);
+            splitResult->S1.insert(value);
+        }
+
+        for(size_t i = 0; i < category_items.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(category_items[i].category);
+            splitResult->S.insert(value);
+        }
+
+        return splitResult;
+    } else {//if (!Y->is_ordinal) // best_Xi categorical and Y categorical brute force algorithm
+
+        CategoricalSplitResult<Tx>* splitResult = new CategoricalSplitResult<Tx>();
+        splitResult->pos = start + best.offset;
+        splitResult->column_idx = best.column_idx;
+        splitResult->best_impurity = best.impurity_improvement;
+
+        for(size_t i = 0; i < best.S1.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(ordered_items[best.S1[i]].category);
+            splitResult->S1.insert(value);
+        }
+
+        for(size_t i = 0; i < ordered_items.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(ordered_items[i].category);
+            splitResult->S.insert(value);
+        }
+
+        return splitResult;
+    }
+}
+
+//form the final result after all columns are checked
+//!!! return value needs to be deleted outside !!!
+template <class Tx, class Ty>
+SplitResult* create_split_result_mid(Matrix & dataset, vector<size_t>::iterator start, Best &best, //take mid value for floating point numbers
+                                 vector<id_value<Tx, Ty>> &pairs,
+                                 vector<category_item> &category_items,
+                                 vector<Item> &ordered_items) {
+    //shuffle back row_idx array for recursive split later
+
+    Column* best_Xi = dataset.get_column(best.column_idx);
+    Column* Y = dataset.get_column(y_index);
+
+    if(best_Xi->is_ordinal) {
+#ifdef ASSERT
+        assert(pairs.size() > 0);
+#endif
+        OrdinalSplitResult<Tx>* ordinalSplitResult = new OrdinalSplitResult<Tx>();
+        ordinalSplitResult->pos = start + best.offset + 1;
+        ordinalSplitResult->column_idx = best.column_idx;
+        ordinalSplitResult->best_impurity = best.impurity_improvement;
+
+        // split_value (0 + offset + 1)
+        Tx mid = pairs[best.offset].x_value + pairs[best.offset + 1].x_value;
+        ordinalSplitResult->attribute_value = mid/2;
+
+        return ordinalSplitResult;
+    } else if (Y->is_ordinal) { // breiman's algorithm Xi categorical, Y ordinal (continuous)
+#ifdef ASSERT
+        assert(category_items.size() > 0);
+#endif
+
+        CategoricalSplitResult<Tx>* splitResult = new CategoricalSplitResult<Tx>();
+        splitResult->pos = start + best.offset;
+        splitResult->column_idx = best.column_idx;
+        splitResult->best_impurity = best.impurity_improvement;
+
+        for(size_t i = 0; i < best.S1.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(category_items[best.S1[i]].category);
+            splitResult->S1.insert(value);
+        }
+
+        for(size_t i = 0; i < category_items.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(category_items[i].category);
+            splitResult->S.insert(value);
+        }
+
+        return splitResult;
+    } else {//if (!Y->is_ordinal) // best_Xi categorical and Y categorical brute force algorithm
+
+        CategoricalSplitResult<Tx>* splitResult = new CategoricalSplitResult<Tx>();
+        splitResult->pos = start + best.offset;
+        splitResult->column_idx = best.column_idx;
+        splitResult->best_impurity = best.impurity_improvement;
+
+        for(size_t i = 0; i < best.S1.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(ordered_items[best.S1[i]].category);
+            splitResult->S1.insert(value);
+        }
+
+        for(size_t i = 0; i < ordered_items.size(); i++) {
+            Tx value = boost::lexical_cast<Tx>(ordered_items[i].category);
+            splitResult->S.insert(value);
+        }
+
+        return splitResult;
+    }
+}
+
+//form the final result after all columns are checked
+//!!! return value needs to be deleted outside !!!
+template <class Tx, class Ty>
+SplitResult* create_split_result_mid_int(Matrix & dataset, vector<size_t>::iterator start, Best &best, //take mid value for floating point numbers
+                                 vector<id_value<Tx, Ty>> &pairs,
+                                 vector<category_item> &category_items,
+                                 vector<Item> &ordered_items) {
+    //shuffle back row_idx array for recursive split later
+
+    Column* best_Xi = dataset.get_column(best.column_idx);
+    Column* Y = dataset.get_column(y_index);
+
+    if(best_Xi->is_ordinal) {
+#ifdef ASSERT
+        assert(pairs.size() > 0);
+#endif
+        OrdinalSplitResult<Tx>* ordinalSplitResult = new OrdinalSplitResult<Tx>();
+        ordinalSplitResult->pos = start + best.offset + 1;
+        ordinalSplitResult->column_idx = best.column_idx;
+        ordinalSplitResult->best_impurity = best.impurity_improvement;
+
+        // split_value (0 + offset + 1)
+        Tx mid = pairs[best.offset].x_value + pairs[best.offset + 1].x_value;
+        if(mid % 2 == 1) mid++; //round up
+        ordinalSplitResult->attribute_value = mid/2;
 
         return ordinalSplitResult;
     } else if (Y->is_ordinal) { // breiman's algorithm Xi categorical, Y ordinal (continuous)
@@ -1055,6 +1192,69 @@ SplitResult* create_split_result_wrapper(Matrix &dataset, vector<size_t>::iterat
     }
 }
 
+template<class Tx, class Ty>
+SplitResult* create_split_result_mid_wrapper(Matrix &dataset, vector<size_t>::iterator start,
+                                         vector<size_t>::iterator &end, Best &best) {
+
+    Column* best_Xi = dataset.get_column(best.column_idx);
+    Column* y = dataset.get_column(y_index);
+
+    vector<id_value<Tx, Ty>> pairs; // Xi ordinal
+    vector<category_item> category_items; // breiman
+    vector<Item> ordered_items; // brute force
+
+    align_missing<Tx, Ty>(dataset, best.column_idx, start, end, pairs);
+
+    if(best_Xi->is_ordinal) {
+        std::sort(pairs.begin(), pairs.end());
+        update_pair_indices<Tx, Ty>(start, pairs);
+
+        return create_split_result_mid<Tx, Ty>(dataset, start, best, pairs, category_items, ordered_items);
+    } else if (y->is_ordinal) { // breiman
+        row_sort_categorical(start, pairs, category_items);
+        set_sorted_indices(start, category_items);
+
+        return create_split_result_mid<Tx, Ty>(dataset, start, best, pairs, category_items, ordered_items);
+    } else //if (!y->is_ordinal)
+    { // brute force
+        set_grouped_item<Tx, Ty>(pairs, ordered_items, best);
+        update_category_order(start, ordered_items, best.S1);
+
+        return create_split_result_mid<Tx, Ty>(dataset, start, best, pairs, category_items, ordered_items);
+    }
+}
+
+template<class Tx, class Ty>
+SplitResult* create_split_result_mid_int_wrapper(Matrix &dataset, vector<size_t>::iterator start,
+                                         vector<size_t>::iterator &end, Best &best) {
+
+    Column* best_Xi = dataset.get_column(best.column_idx);
+    Column* y = dataset.get_column(y_index);
+
+    vector<id_value<Tx, Ty>> pairs; // Xi ordinal
+    vector<category_item> category_items; // breiman
+    vector<Item> ordered_items; // brute force
+
+    align_missing<Tx, Ty>(dataset, best.column_idx, start, end, pairs);
+
+    if(best_Xi->is_ordinal) {
+        std::sort(pairs.begin(), pairs.end());
+        update_pair_indices<Tx, Ty>(start, pairs);
+
+        return create_split_result_mid_int<Tx, Ty>(dataset, start, best, pairs, category_items, ordered_items);
+    } else if (y->is_ordinal) { // breiman
+        row_sort_categorical(start, pairs, category_items);
+        set_sorted_indices(start, category_items);
+
+        return create_split_result_mid_int<Tx, Ty>(dataset, start, best, pairs, category_items, ordered_items);
+    } else //if (!y->is_ordinal)
+    { // brute force
+        set_grouped_item<Tx, Ty>(pairs, ordered_items, best);
+        update_category_order(start, ordered_items, best.S1);
+
+        return create_split_result_mid_int<Tx, Ty>(dataset, start, best, pairs, category_items, ordered_items);
+    }
+}
 
 void find_best_split_column(Matrix & dataset, vector<size_t>::iterator start, Best & current,
                             Best & best, TreeConfig & treeConfig) {
@@ -1408,6 +1608,294 @@ void find_best_split_column(Matrix & dataset, vector<size_t>::iterator start, Be
     }
 }
 
+
+// =========== newly added for ExtraTrees ==========
+std::random_device rd;
+std::mt19937 mt(rd());
+double sample(double left, double right)
+{
+	std::uniform_real_distribution<double> dist(left, right);
+	return dist(mt);
+}
+// =========== newly added for ExtraTrees ==========
+template <class Tx, class Ty>
+void set_random_pos_regression(vector<id_value<Tx, Ty>> &pairs, Best &current, double split_val) {
+    //output:
+    //best_impurity_improvement
+    //best offest: the chosen split position from "start"
+    // feature_value (Xi) of type numerical expected (ref: FEATURE_THRESHOLD)
+#ifdef ASSERT
+    assert(typeid(Tx) != typeid(char));
+    assert(typeid(Tx) != typeid(string));
+    assert(typeid(Tx) != typeid(bool));
+#endif
+    current.impurity_improvement = -DBL_MAX;
+    var_sketch left;
+    var_sketch right;
+    set_sketch<Tx, Ty>(right, pairs);
+    for (size_t i = 0; i < pairs.size() - 1; i++) {
+        id_value<Tx, Ty> &pair = pairs[i];
+        update_sketches<Ty>(left, right, pair.y_value); //update with the current element
+        if(pairs[i+1].x_value == pair.x_value) continue;
+        if(pairs[i+1].x_value >= split_val) // this is the only place to split and check
+        {
+        	double var_L = var(left);
+			double var_R = var(right);
+			double impurity_improvement = impurity_improvement_fn(var_L, var_R, left.sum_1, right.sum_1);
+			if (current.impurity_improvement < impurity_improvement) {
+				current.impurity_improvement = impurity_improvement;
+				current.offset = i; //like (it - start) == (i - 0);
+			}
+			return; // once reach the place, return immediately
+        }
+    }
+}
+// =========== newly added for ExtraTrees ==========
+template <class Tx, class Ty>
+void set_random_pos_classification(vector<id_value<Tx, Ty>> &pairs, Best &current, TreeConfig &treeConfig, double split_val) {
+    //output:
+    //Best current
+#ifdef ASSERT
+    assert(typeid(Tx) != typeid(char));
+    assert(typeid(Tx) != typeid(string));
+#endif
+    //ToDo :: ordered string is rare, can implement if needed
+    current.impurity_improvement = -DBL_MAX;
+    classify_sketch<Ty> left;
+    classify_sketch<Ty> right;
+    set_sketch<Tx, Ty>(right, pairs);
+    for (size_t i = 0; i < pairs.size() - 1; i++) {
+        id_value<Tx, Ty> &pair = pairs[i];
+        update_sketches<Ty>(left, right, pair.y_value); //update with the current element
+        if(pairs[i+1].x_value == pair.x_value) continue;
+        if(pairs[i+1].x_value >= split_val) // this is the only place to split and check
+        {
+        	//compute pi
+			vector<double> left_tgt_ratio;
+			vector<double> right_tgt_ratio;
+			left.set_ratio(left_tgt_ratio);
+			right.set_ratio(right_tgt_ratio);
+			double left_impurity;
+			double right_impurity;
+			if (treeConfig.IMPURITY_FUNC == IMPURITY_ENTROPY) {
+				left_impurity = entropy(left_tgt_ratio);
+				right_impurity = entropy(right_tgt_ratio);
+			} else if (treeConfig.IMPURITY_FUNC == IMPURITY_GINI) {
+				left_impurity = gini(left_tgt_ratio);
+				right_impurity = gini(right_tgt_ratio);
+			} else if (treeConfig.IMPURITY_FUNC == IMPURITY_CLASSIFICATION_ERROR) {
+				left_impurity = classification_error(left_tgt_ratio);
+				right_impurity = classification_error(right_tgt_ratio);
+			} else {
+				cout<< "[ERROR] for classification we only consider entropy, "
+						"gini and classification error as impurity function " << endl;
+				exit(-1);
+			}
+			double impurity_improvement = impurity_improvement_fn(left_impurity, right_impurity, left.N, right.N);
+			if (current.impurity_improvement < impurity_improvement) {
+				current.impurity_improvement = impurity_improvement;
+				current.offset = i; // (it - start) ==  (i - 0)
+			}
+			return; // once reach the place, return immediately
+        }
+    }
+}
+// =========== newly added for ExtraTrees ==========
+template <class Tx, class Ty>
+void update_random_split_ordinal_regression(Matrix &dataset, vector<size_t>::iterator start, TreeConfig &treeConfig,
+                                              Best &current, Best &best) {
+    vector<id_value<Tx, Ty>> pairs;
+    align_missing<Tx, Ty>(dataset, current.column_idx, start, current.end, pairs);
+    if(start == current.end) { // all data values are missing
+        if(!NO_WARNING) cout<< "[Warning] Skip the feature with index = " << current.column_idx << " (all are missing)" << endl;
+        return;
+    }
+    std::sort(pairs.begin(), pairs.end());
+    double split_val = sample(boost::lexical_cast<double>(pairs.front().x_value), boost::lexical_cast<double>(pairs.back().x_value));
+    set_random_pos_regression<Tx, Ty>(pairs, current, split_val);
+    //---
+    if(current.impurity_improvement > best.impurity_improvement
+       || (current.impurity_improvement == best.impurity_improvement
+           && current.column_idx < best.column_idx)) {
+        best.impurity_improvement = current.impurity_improvement;
+        best.column_idx = current.column_idx;
+        best.offset = current.offset;
+        best.end = current.end;
+    }
+}
+// =========== newly added for ExtraTrees ==========
+template <class Tx, class Ty>
+void update_random_split_ordinal_classification(Matrix &dataset, vector<size_t>::iterator start, TreeConfig &treeConfig,
+                               Best &current, Best &best) {
+    vector<id_value<Tx, Ty>> pairs;
+    align_missing<Tx, Ty>(dataset, current.column_idx, start, current.end, pairs);
+    if(start == current.end) { // all data values are missing
+        if(!NO_WARNING) cout<< "[Warning] Skip the feature with index = " << current.column_idx << " (all are missing)" << endl;
+        return;
+    }
+    std::sort(pairs.begin(), pairs.end());
+    double split_val = sample(boost::lexical_cast<double>(pairs.front().x_value), boost::lexical_cast<double>(pairs.back().x_value));
+    set_random_pos_classification<Tx, Ty>(pairs, current, treeConfig, split_val);
+    //---
+    if(current.impurity_improvement > best.impurity_improvement
+       || (current.impurity_improvement == best.impurity_improvement
+           && current.column_idx < best.column_idx)) {
+        best.impurity_improvement = current.impurity_improvement;
+        best.column_idx = current.column_idx;
+        best.offset = current.offset;
+        best.end = current.end;
+    }
+}
+// =========== newly added for ExtraTrees ==========
+void find_random_split_column(Matrix & dataset, vector<size_t>::iterator start, Best & current,
+                            Best & best, TreeConfig & treeConfig) {
+	cout<<"CALLED !!!"<<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	Column* Xi = dataset.get_column(current.column_idx);
+	Column* y = dataset.get_column(y_index);
+	if(Xi->is_ordinal)
+	{
+		if(treeConfig.IMPURITY_FUNC == IMPURITY_VARIANCE) {
+			if(Xi->data_type ==  ELEM_SHORT) {
+				if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_regression<short, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_regression<short, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_regression<short, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_regression<short, double>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			} else if(Xi->data_type ==  ELEM_INT) {
+				if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_regression<int, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_regression<int, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_regression<int, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_regression<int, double>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			} else if(Xi->data_type ==  ELEM_FLOAT) {
+				if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_regression<float, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_regression<float, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_regression<float, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_regression<float, double>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			} else if(Xi->data_type ==  ELEM_DOUBLE) {
+				if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_regression<double, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_regression<double, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_regression<double, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_regression<double, double>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			}
+		} else if (treeConfig.IMPURITY_FUNC == IMPURITY_ENTROPY
+				   || treeConfig.IMPURITY_FUNC == IMPURITY_GINI
+				   || treeConfig.IMPURITY_FUNC == IMPURITY_CLASSIFICATION_ERROR) {
+			if(Xi->data_type ==  ELEM_SHORT) {
+				if(y->data_type ==  ELEM_BOOL) {
+					update_random_split_ordinal_classification<short, bool>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_classification<short, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_classification<short, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_classification<short, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_classification<short, double>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_CHAR) {
+					update_random_split_ordinal_classification<short, char>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_STRING) {
+					update_random_split_ordinal_classification<short, string>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			} else if(Xi->data_type ==  ELEM_INT) {
+				if(y->data_type ==  ELEM_BOOL) {
+					update_random_split_ordinal_classification<int, bool>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_classification<int, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_classification<int, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_classification<int, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_classification<int, double>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_CHAR) {
+					update_random_split_ordinal_classification<int, char>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_STRING) {
+					update_random_split_ordinal_classification<int, string>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			} else if(Xi->data_type ==  ELEM_FLOAT) {
+				if(y->data_type ==  ELEM_BOOL) {
+					update_random_split_ordinal_classification<float, bool>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_classification<float, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_classification<float, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_classification<float, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_classification<float, double>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_CHAR) {
+					update_random_split_ordinal_classification<float, char>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_STRING) {
+					update_random_split_ordinal_classification<float, string>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			} else if(Xi->data_type ==  ELEM_DOUBLE) {
+				if(y->data_type ==  ELEM_BOOL) {
+					update_random_split_ordinal_classification<double, bool>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_SHORT) {
+					update_random_split_ordinal_classification<double, short>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_INT) {
+					update_random_split_ordinal_classification<double, int>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_FLOAT) {
+					update_random_split_ordinal_classification<double, float>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_DOUBLE) {
+					update_random_split_ordinal_classification<double, double>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_CHAR) {
+					update_random_split_ordinal_classification<double, char>(dataset, start, treeConfig, current, best);
+				} else if(y->data_type ==  ELEM_STRING) {
+					update_random_split_ordinal_classification<double, string>(dataset, start, treeConfig, current, best);
+				} else {
+					cout<<"File: " << __FILE__<< ", Line = " <<__LINE__ << ": Wrong type " << endl;
+					exit(-1);
+				}
+			}
+		}
+	} else {
+		cout<<"File: " << __FILE__<< ", Line " << __LINE__<< ": [ERROR] Xi is categorical, not supported for completely random trees" << endl;
+		exit(-1);
+	}
+}
+
+
 SplitResult* node_split(Matrix & dataset, vector<size_t>::iterator start, vector<size_t>::iterator &end,
                         vector<int> & cols, TreeConfig &treeConfig) {
     // need to pass end param as reference, value might change (align_missing(.) case)
@@ -1421,6 +1909,8 @@ SplitResult* node_split(Matrix & dataset, vector<size_t>::iterator start, vector
 
     Best best;
 
+    cout<<"in node_split, cols.size() = "<<cols.size()<<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
     for(size_t col_idx = 0; col_idx < cols.size(); col_idx++) {
         if(cols[col_idx] == y_index) continue; // skipping target_column from splitting
 
@@ -1428,7 +1918,10 @@ SplitResult* node_split(Matrix & dataset, vector<size_t>::iterator start, vector
         current.column_idx = cols[col_idx];
         current.end = end;
 
-        find_best_split_column(dataset, start, current, best, treeConfig);
+        cout<<"treeConfig.type = "<<treeConfig.type<<endl;//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+        if(treeConfig.type == EXTRA_TREES) find_random_split_column(dataset, start, current, best, treeConfig);
+        else find_best_split_column(dataset, start, current, best, treeConfig);
 
     }
 
@@ -1463,95 +1956,95 @@ SplitResult* node_split(Matrix & dataset, vector<size_t>::iterator start, vector
         }
     } else if(best_Xi->data_type == ELEM_SHORT) {
         if(y->data_type == ELEM_BOOL) {
-            return create_split_result_wrapper<short, bool>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, bool>(dataset, start, end, best);
         } else if(y->data_type == ELEM_SHORT) {
-            return create_split_result_wrapper<short, short>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, short>(dataset, start, end, best);
         } else if(y->data_type == ELEM_INT) {
-            return create_split_result_wrapper<short, int>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, int>(dataset, start, end, best);
         } else if(y->data_type == ELEM_FLOAT) {
-            return create_split_result_wrapper<short, float>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, float>(dataset, start, end, best);
         } else if(y->data_type == ELEM_DOUBLE) {
-            return create_split_result_wrapper<short, double>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, double>(dataset, start, end, best);
         } else if(y->data_type == ELEM_CHAR) {
-            return create_split_result_wrapper<short, char>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, char>(dataset, start, end, best);
         } else if(y->data_type == ELEM_STRING) {
-            return create_split_result_wrapper<short, string>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<short, string>(dataset, start, end, best);
         }  else {
             cout<<"File: " << __FILE__<<", Line "<< __LINE__ << ": [ERROR] unknown data type" << endl;
             exit(-1);
         }
     } else if(best_Xi->data_type == ELEM_INT) {
         if(y->data_type == ELEM_BOOL) {
-            return create_split_result_wrapper<int, bool>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, bool>(dataset, start, end, best);
         } else if(y->data_type == ELEM_SHORT) {
-            return create_split_result_wrapper<int, short>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, short>(dataset, start, end, best);
         } else if(y->data_type == ELEM_INT) {
-            return create_split_result_wrapper<int, int>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, int>(dataset, start, end, best);
         } else if(y->data_type == ELEM_FLOAT) {
-            return create_split_result_wrapper<int, float>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, float>(dataset, start, end, best);
         } else if(y->data_type == ELEM_DOUBLE) {
-            return create_split_result_wrapper<int, double>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, double>(dataset, start, end, best);
         } else if(y->data_type == ELEM_CHAR) {
-            return create_split_result_wrapper<int, char>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, char>(dataset, start, end, best);
         } else if(y->data_type == ELEM_STRING) {
-            return create_split_result_wrapper<int, string>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<int, string>(dataset, start, end, best);
         } else {
             cout<<"File: " << __FILE__<<", Line "<< __LINE__ << ": [ERROR] unknown data type" << endl;
             exit(-1);
         }
     } else if(best_Xi->data_type == ELEM_FLOAT) {
         if(y->data_type == ELEM_BOOL) {
-            return create_split_result_wrapper<float, bool>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, bool>(dataset, start, end, best);
         } else if(y->data_type == ELEM_SHORT) {
-            return create_split_result_wrapper<float, short>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, short>(dataset, start, end, best);
         } else if(y->data_type == ELEM_INT) {
-            return create_split_result_wrapper<float, int>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, int>(dataset, start, end, best);
         } else if(y->data_type == ELEM_FLOAT) {
-            return create_split_result_wrapper<float, float>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, float>(dataset, start, end, best);
         } else if(y->data_type == ELEM_DOUBLE) {
-            return create_split_result_wrapper<float, double>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, double>(dataset, start, end, best);
         } else if(y->data_type == ELEM_CHAR) {
-            return create_split_result_wrapper<float, char>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, char>(dataset, start, end, best);
         } else if(y->data_type == ELEM_STRING) {
-            return create_split_result_wrapper<float, string>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<float, string>(dataset, start, end, best);
         } else {
             cout<<"File: " << __FILE__<<", Line "<< __LINE__ << ": [ERROR] unknown data type" << endl;
             exit(-1);
         }
     } else if(best_Xi->data_type == ELEM_DOUBLE) {
         if(y->data_type == ELEM_BOOL) {
-            return create_split_result_wrapper<double, bool>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, bool>(dataset, start, end, best);
         } else if(y->data_type == ELEM_SHORT) {
-            return create_split_result_wrapper<double, short>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, short>(dataset, start, end, best);
         } else if(y->data_type == ELEM_INT) {
-            return create_split_result_wrapper<double, int>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, int>(dataset, start, end, best);
         } else if(y->data_type == ELEM_FLOAT) {
-            return create_split_result_wrapper<double, float>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, float>(dataset, start, end, best);
         } else if(y->data_type == ELEM_DOUBLE) {
-            return create_split_result_wrapper<double, double>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, double>(dataset, start, end, best);
         } else if(y->data_type == ELEM_CHAR) {
-            return create_split_result_wrapper<double, char>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, char>(dataset, start, end, best);
         } else if(y->data_type == ELEM_STRING) {
-            return create_split_result_wrapper<double, string>(dataset, start, end, best);
+            return create_split_result_mid_wrapper<double, string>(dataset, start, end, best);
         } else {
             cout<<"File: " << __FILE__<<", Line "<< __LINE__ << ": [ERROR] unknown data type" << endl;
             exit(-1);
         }
     } else if(best_Xi->data_type == ELEM_CHAR) {
         if(y->data_type == ELEM_BOOL) {
-            return create_split_result_wrapper<char, bool>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, bool>(dataset, start, end, best);
         } else if(y->data_type == ELEM_SHORT) {
-            return create_split_result_wrapper<char, short>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, short>(dataset, start, end, best);
         } else if(y->data_type == ELEM_INT) {
-            return create_split_result_wrapper<char, int>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, int>(dataset, start, end, best);
         } else if(y->data_type == ELEM_FLOAT) {
-            return create_split_result_wrapper<char, float>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, float>(dataset, start, end, best);
         } else if(y->data_type == ELEM_DOUBLE) {
-            return create_split_result_wrapper<char, double>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, double>(dataset, start, end, best);
         } else if(y->data_type == ELEM_CHAR) {
-            return create_split_result_wrapper<char, char>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, char>(dataset, start, end, best);
         } else if(y->data_type == ELEM_STRING) {
-            return create_split_result_wrapper<char, string>(dataset, start, end, best);
+            return create_split_result_mid_int_wrapper<char, string>(dataset, start, end, best);
         } else {
             cout<<"File: " << __FILE__<<", Line "<< __LINE__ << ": [ERROR] unknown data type" << endl;
             exit(-1);

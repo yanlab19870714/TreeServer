@@ -586,26 +586,6 @@ public:
     }
 };
 
-/////////////// TreeConfig //////////////////
-
-ibinstream & operator<<(ibinstream & m, const TreeConfig & treeConfig) {
-    m << treeConfig.IMPURITY_FUNC;
-    m << treeConfig.MAX_TREE_DEPTH;
-    m << treeConfig.MIN_SAMPLE_LEAF;
-    m << treeConfig.n_columns;
-
-    return m;
-}
-
-obinstream & operator>>(obinstream & m, TreeConfig & treeConfig) {
-    m >> treeConfig.IMPURITY_FUNC;
-    m >> treeConfig.MAX_TREE_DEPTH;
-    m >> treeConfig.MIN_SAMPLE_LEAF;
-    m >> treeConfig.n_columns;
-
-    return m;
-}
-
 /////////////// plan from master to slave ///////////////
 
 TreeNode* dummy;
