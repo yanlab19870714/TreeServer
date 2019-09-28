@@ -324,7 +324,9 @@ void load_config(const char* tree_config_fname, vector<TreeConfig> &configList) 
 
     while(getline(fin, line)) {
         //# get MAX_TREE_DEPTH
-        while(line.length() == 0 || line[0] == '#') getline(fin, line); // skip blank lines or lines starting with #
+        while(line.length() == 0 || line[0] == '#'){
+            if(!getline(fin, line)) return; // skip blank lines or lines starting with #
+        }
 
         TreeConfig t_config;
 
