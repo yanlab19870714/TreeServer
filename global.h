@@ -175,6 +175,51 @@ inline int get_num_workers()
     return _num_workers;
 }
 
+
+vector<int> all_columns; // all column indices except Y, initialize in Worker::run(), should be synchrinized afterwards
+
+void random_shuffle(int k, vector<int> & result) {
+#ifdef ASSERT
+    assert(all_columns.size() == (_num_columns - 1));
+#endif
+
+    int num_columns = all_columns.size();
+
+    for(int index = 0; index < k; index++) {
+        int random_pos = index + (rand() % (num_columns - index));
+        std::swap(all_columns[index], all_columns[random_pos]);
+    }
+
+    for(int index = 0; index < k; index++) {
+        result.push_back(all_columns[index]);
+    }
+
+#ifdef ASSERT
+    vector<bool> check(_num_columns, false);
+    check[y_index] = true;
+
+    for(int index = 0; index < num_columns; index++) {
+        check[all_columns[index]] = true;
+    }
+
+    bool is_true = true;
+    for(int index = 0; index < num_columns; index++) {
+        is_true = is_true && check[index];
+    }
+
+    if(!is_true) {
+        cout << "column_indices are : " << endl;
+        for(size_t index = 0; index < all_columns.size(); index++) {
+            cout << "|" << all_columns[index] << "|, found = " << check[index] << ", File = " << __FILE__
+                 << ", Line = " << __LINE__ << endl;
+        }
+    }
+
+    assert(is_true);
+#endif
+}
+
+
 //@@@@@@@@@@@@@@@@@@@@ Da Yan debug todo:: remove
 #ifdef DEBUG_LOG
 ofstream fout; // todo debug remove later, note that many threads write to the same file; do this for simplicity but may have mixed text streams

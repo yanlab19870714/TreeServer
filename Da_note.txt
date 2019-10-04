@@ -1,0 +1,91 @@
+====== Changes to Support Completely Random Decision Trees (ETs) ======
+random_shuffle is moved from MasterRecver.h to global.h
+
+
+
+* MasterRecver::create_node_and_plans(.)
+
+else if (treeConfig.sample_col_each_node == false && task_best_split->left_D < subtree_D) { // left subtree plan
+====>
+if (task_best_split->left_D < subtree_D)
+(symmetrically, should change the right_D part)
+
+
+
+* MasterRecver::create_node_and_plans(.)
+	if(task_best_split->right_D < subtree_D && task_best_split->right_D > treeConfig.MIN_SAMPLE_LEAF) {
+        total_parent_request++; //key slave of subtree plan will ask for row indices
+    }
+===> if(treeConfig.sample_col_each_node == false <----- 1st condition should be removed
+
+
+
+* Worker::create_root_subtree_plans(.)
+do not create column-task
+
+
+
+* should pass treeconfig.resampling in plan ============== already satisfied
+
+
+
+* tree.h: build_tree(.): this version resamples columns from the set of all columns for each node split if resampling is enabled ----------> mention that in paper
+basically, the function changes "cols" to input to node_split(.)
+
+    if(treeConfig.sample_col_each_node) {
+    	cols.clear();
+		random_shuffle(_num_columns, cols);
+	}
+
+note that node_split(.) calls find_random_split_column(.) for ETs; so split value sampling is properly handled
+build_tree(.) is called in comper.h
+
+
+
+* since task->matrix is used by comper for build_tree(.), task->matrix should request for all columns
+3 places:
+- Worker: create_root_subtree_plans
+- MasterRecver::create_node_and_plans(.), 2 subtree branches -> inside create_subtree_plan(.) we set columns, but will be changed if needed in update_task_master(.) below
+
+In run_slave(), we have
+vector<int> & columns_to_consider = subtree_task->column_indices; ---> if random-col-sampling, this should be set by master considering all columns
+
+
+
+* Worker.h, update_task_master(.):
+
+if(s_plan->tree_config.sample_col_each_node) {
+	s_plan->column_indices.clear();
+    //random_shuffle(s_plan->tree_config.n_columns, s_plan->column_indices); //wrong, should including all columns to sample from
+	for(int i=0; i<_num_columns; i++) if(i != y_index) s_plan->column_indices.push_back(i);  ----------> mention that in paper
+}
+
+
+
+* MasterRecver::set_subtree_assignment(.) is properly handled:
+
+int n_columns = s_plan->tree_config.n_columns;
+size_t temp_load = s_plan->size * n_columns * log2(s_plan->size);
+(so computing cost is really according to sampled column number)
+
+communication cost is properly set according to cols
+
+
+
+* [!!! IMPORTANT] MasterRecver::create_node_and_plans
+int total_parent_request = treeConfig.n_columns * 2;
+=>
+if ET, a subtree task contributes _num_columns not treeConfig.n_columns
+
+add 2 stmts:
+	if(treeConfig.sample_col_each_node) total_parent_request += - treeConfig.n_columns + _num_columns - 1; ----------> mention that in paper
+
+	
+* to randomly sample a split-val from [min, max], it is possible to have min == max
+this is because all values of the sampled column are the same
+this will return best_idx = -2 and MasterRecv will call skip_response() to create leaf node
+
+
+
+* [!!! IMPORTANT] BUG FIX
+send_end_plan(.) should go through PlanQueue, or some delete-plan may arrive later than the end-plan...

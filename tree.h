@@ -359,7 +359,13 @@ void set_categorical_node(TreeNode* &node, SplitResult *result, string node_labe
 TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, vector<size_t>::iterator end, int tree_depth) {
 
     vector<int> & cols = task->column_indices;
+
     TreeConfig & treeConfig = task->tree_config;
+
+    if(treeConfig.sample_col_each_node) {
+    	cols.clear();
+		random_shuffle(_num_columns, cols);
+	}
 
     bool end_of_path = (tree_depth == treeConfig.MAX_TREE_DEPTH);
 

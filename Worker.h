@@ -149,66 +149,32 @@ public:
 
 			TreeConfig & treeConfig = configList[index];
 
-			if(treeConfig.sample_col_each_node == false)
-			{
-				if(treeConfig.type == DECISION_TREE) {
-					TreeConfig p_config;
-					set_config(treeConfig, p_config, 0);
+			if(treeConfig.type == DECISION_TREE) {
+				TreeConfig p_config;
+				set_config(treeConfig, p_config, 0);
 
-					subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[0],
-																	  treeConfig.column_distribution[0]);
+				subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[0],
+																  treeConfig.column_distribution[0]);
+				subtreePlan->root_task_id = subtreePlan->task_id;
+
+				root_plan_buffer.push(subtreePlan);
+
+			} else if (treeConfig.type == RANDOM_FOREST || treeConfig.type == EXTRA_TREES) {
+				int n_plans = treeConfig.column_distribution.size();
+
+				for(int k = 0; k < n_plans; k++) {
+					TreeConfig p_config;
+					set_config(treeConfig, p_config, k);
+
+					subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[k],
+																	  treeConfig.column_distribution[k]);
 					subtreePlan->root_task_id = subtreePlan->task_id;
 
 					root_plan_buffer.push(subtreePlan);
-
-				} else if (treeConfig.type == RANDOM_FOREST || treeConfig.type == EXTRA_TREES) {
-					int n_plans = treeConfig.column_distribution.size();
-
-					for(int k = 0; k < n_plans; k++) {
-						TreeConfig p_config;
-						set_config(treeConfig, p_config, k);
-
-						subtree_plan* subtreePlan = create_subtree_plan(p_config, treeConfig.rootList[k],
-																		  treeConfig.column_distribution[k]);
-						subtreePlan->root_task_id = subtreePlan->task_id;
-
-						root_plan_buffer.push(subtreePlan);
-					}
-				} else {
-					cout << "ERROR: wrong type, File = " << __FILE__ << ", Line = " << __LINE__ << endl;
-					exit(-1);
 				}
-			}
-			else
-			{
-				if(treeConfig.type == DECISION_TREE) {
-					TreeConfig p_config;
-					set_config(treeConfig, p_config, 0);
-
-					column_split_plan* empty_plan = create_empty_plan(p_config, treeConfig.rootList[0],
-																	  treeConfig.column_distribution[0]);
-					empty_plan->root_task_id = empty_plan->task_id;
-
-					root_plan_buffer.push(empty_plan);
-
-				} else if (treeConfig.type == RANDOM_FOREST || treeConfig.type == EXTRA_TREES) {
-					int n_plans = treeConfig.column_distribution.size();
-
-					for(int k = 0; k < n_plans; k++) {
-						TreeConfig p_config;
-						set_config(treeConfig, p_config, k);
-
-						column_split_plan* empty_plan = create_empty_plan(p_config, treeConfig.rootList[k],
-																		  treeConfig.column_distribution[k]);
-						empty_plan->root_task_id = empty_plan->task_id;
-
-						root_plan_buffer.push(empty_plan);
-					}
-				} else {
-					cout << "ERROR: wrong type, type found = " << treeConfig.type << " File = " << __FILE__
-						 << ", Line = " << __LINE__ << endl;
-					exit(-1);
-				}
+			} else {
+				cout << "ERROR: wrong type, File = " << __FILE__ << ", Line = " << __LINE__ << endl;
+				exit(-1);
 			}
 		}
 	}
@@ -269,17 +235,13 @@ public:
 		}
     }
 
-	void send_end_plan() {
-		plan end_plan(dummy);
-		end_plan.message_type = END_PLAN;
-        //end_plan.task_id = -1; not used
-
-		ibinstream m1;
-		m1 << end_plan;
-
+	void send_end_plan(PlanQueue & planQueue) {
 		for(int i = 0; i < _num_workers; i++) {
 			if(i != MASTER_RANK) {
-				send_ibinstream(m1, i, PLAN_CHANNEL);
+				plan * end_plan = new plan(dummy);
+				end_plan->message_type = END_PLAN;
+				end_plan->dest_id = i;
+				planQueue.add(end_plan);
 			}
 		}
 
@@ -358,7 +320,9 @@ public:
 
             if(s_plan->tree_config.sample_col_each_node) {
 				s_plan->column_indices.clear();
-                random_shuffle(s_plan->tree_config.n_columns, s_plan->column_indices);
+                //random_shuffle(s_plan->tree_config.n_columns, s_plan->column_indices); //wrong, should including all columns to sample from
+				for(int i=0; i<_num_columns; i++)
+					if(i != y_index) s_plan->column_indices.push_back(i);
             }
 
 			task_master->column_indices = s_plan->column_indices;

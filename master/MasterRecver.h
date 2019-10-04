@@ -59,49 +59,6 @@ using namespace std;
 vector<vector<int>> mac_map; //mac_map[column_id] = list of machine IDs
 //need to resize() after loading metadata !!!
 
-vector<int> all_columns; // all column indices except Y, initialize in Worker::run(), should be synchrinized afterwards
-
-void random_shuffle(int k, vector<int> & result) {
-#ifdef ASSERT
-    assert(all_columns.size() == (_num_columns - 1));
-#endif
-
-    int num_columns = all_columns.size();
-
-    for(int index = 0; index < k; index++) {
-        int random_pos = index + (rand() % (num_columns - index));
-        std::swap(all_columns[index], all_columns[random_pos]);
-    }
-
-    for(int index = 0; index < k; index++) {
-        result.push_back(all_columns[index]);
-    }
-
-#ifdef ASSERT
-    vector<bool> check(_num_columns, false);
-    check[y_index] = true;
-
-    for(int index = 0; index < num_columns; index++) {
-        check[all_columns[index]] = true;
-    }
-
-    bool is_true = true;
-    for(int index = 0; index < num_columns; index++) {
-        is_true = is_true && check[index];
-    }
-
-    if(!is_true) {
-        cout << "column_indices are : " << endl;
-        for(size_t index = 0; index < all_columns.size(); index++) {
-            cout << "|" << all_columns[index] << "|, found = " << check[index] << ", File = " << __FILE__
-                 << ", Line = " << __LINE__ << endl;
-        }
-    }
-
-    assert(is_true);
-#endif
-}
-
 //machine loads
 
 #define RECV_IDX 0 //  data receiver thread (REQ_CHANNEL & RESP_CHANNEL)
@@ -529,12 +486,14 @@ public:
         int total_parent_request = treeConfig.n_columns * 2;
 
         if(task_split->level < treeConfig.MAX_TREE_DEPTH - 1) {
-            if(treeConfig.sample_col_each_node == false && task_best_split->left_D < subtree_D && task_best_split->left_D > treeConfig.MIN_SAMPLE_LEAF) {
+            if(task_best_split->left_D < subtree_D && task_best_split->left_D > treeConfig.MIN_SAMPLE_LEAF) {
                 total_parent_request++;
+                if(treeConfig.sample_col_each_node) total_parent_request += - treeConfig.n_columns + _num_columns - 1; //-1 to rule out y_index
             }
 
-            if(treeConfig.sample_col_each_node == false && task_best_split->right_D < subtree_D && task_best_split->right_D > treeConfig.MIN_SAMPLE_LEAF) {
+            if(task_best_split->right_D < subtree_D && task_best_split->right_D > treeConfig.MIN_SAMPLE_LEAF) {
                 total_parent_request++;
+                if(treeConfig.sample_col_each_node) total_parent_request += - treeConfig.n_columns + _num_columns - 1; //-1 to rule out y_index
             }
         }
 
@@ -617,7 +576,7 @@ public:
                 plan_buffer.push_back(left_leaf_plan);
             }
 
-        } else if (treeConfig.sample_col_each_node == false && task_best_split->left_D < subtree_D) { // left subtree plan
+        } else if (task_best_split->left_D < subtree_D) { // left subtree plan
 
             // --- subtree plan as left child, one left-plan
             int new_task_id = ++task_id_counter;
@@ -689,7 +648,7 @@ public:
                 plan_buffer.push_back(right_leaf_plan);
             }
 
-        } else if (treeConfig.sample_col_each_node == false && task_best_split->right_D < subtree_D) { // right subtree plan
+        } else if (task_best_split->right_D < subtree_D) { // right subtree plan
 
             // --- subtree plan as right child, one right-plan
             int new_task_id = ++task_id_counter;
