@@ -882,15 +882,15 @@ public:
         cserver.load_meta(meta_file.c_str()); // HDFS path
         _num_columns = cserver.X.col.size();
 
-		if(_my_rank == MASTER_RANK) {
+        // get all non-y column IDs into "all_columns"
+		for(int j = 0; j < _num_columns; j++) {
+			if(j == y_index) {
+				continue;
+			}
+			all_columns.push_back(j);
+		}
 
-			// get all non-y column IDs into "all_columns"
-            for(int j = 0; j < _num_columns; j++) {
-                if(j == y_index) {
-                    continue;
-                }
-                all_columns.push_back(j);
-            }
+		if(_my_rank == MASTER_RANK) {
 
             // initialize columns of tree-configs
 			for(size_t i = 0; i < configList.size(); i++) {

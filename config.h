@@ -73,7 +73,7 @@ class TreeConfig {
 public:
     string type; // DT, RF
     double column_sample = 1; // percentage of columns to consider at each tree, 100% for a single tree
-    bool sample_col_each_node = false;// sample column for each node
+    bool sample_col_each_node = false;// sample column for each node //todo:: add serialization !!!!!!!!!!!!
 
     int IMPURITY_FUNC = -1;
     int MAX_TREE_DEPTH = INT_MAX;
@@ -90,6 +90,8 @@ public:
 
 ibinstream & operator<<(ibinstream & m, const TreeConfig & treeConfig) {
 	m << treeConfig.type;
+	m << treeConfig.column_sample;
+	m << treeConfig.sample_col_each_node;
     m << treeConfig.IMPURITY_FUNC;
     m << treeConfig.MAX_TREE_DEPTH;
     m << treeConfig.MIN_SAMPLE_LEAF;
@@ -100,6 +102,8 @@ ibinstream & operator<<(ibinstream & m, const TreeConfig & treeConfig) {
 
 obinstream & operator>>(obinstream & m, TreeConfig & treeConfig) {
 	m >> treeConfig.type;
+	m >> treeConfig.column_sample;
+	m >> treeConfig.sample_col_each_node;
     m >> treeConfig.IMPURITY_FUNC;
     m >> treeConfig.MAX_TREE_DEPTH;
     m >> treeConfig.MIN_SAMPLE_LEAF;

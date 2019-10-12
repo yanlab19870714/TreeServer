@@ -364,7 +364,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
 
     if(treeConfig.sample_col_each_node) {
     	cols.clear();
-		random_shuffle(_num_columns, cols);
+		random_shuffle(_num_columns - 1, cols);
 	}
 
     bool end_of_path = (tree_depth == treeConfig.MAX_TREE_DEPTH);
