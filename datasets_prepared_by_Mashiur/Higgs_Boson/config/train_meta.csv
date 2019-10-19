@@ -1,5 +1,5 @@
 #data_type,is_ordinal,is_dense,missing_value,default_value
-int,true,true
+int,false,true
 double,true,true
 double,true,true
 double,true,true
