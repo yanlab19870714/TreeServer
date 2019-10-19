@@ -1231,7 +1231,7 @@ void set_node_label(Matrix & dataset, vector<size_t> & rows, TreeConfig & treeCo
         short label;
 
         if(Y->is_ordinal) {
-            stop_splitting_ordinal<short>(cserver.X, start, end, treeConfig, label);
+            stop_splitting_ordinal_int<short>(cserver.X, start, end, treeConfig, label);
         } else {
             stop_splitting_categorical<short>(cserver.X, start, end, treeConfig, label);
         }
@@ -1242,7 +1242,7 @@ void set_node_label(Matrix & dataset, vector<size_t> & rows, TreeConfig & treeCo
         int label;
 
         if(Y->is_ordinal) {
-            stop_splitting_ordinal<int>(cserver.X, start, end, treeConfig, label);
+            stop_splitting_ordinal_int<int>(cserver.X, start, end, treeConfig, label);
         } else {
             stop_splitting_categorical<int>(cserver.X, start, end, treeConfig, label);
         }

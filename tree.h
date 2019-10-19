@@ -301,6 +301,27 @@ bool stop_splitting_ordinal(Matrix & dataset, vector<size_t>::iterator start, ve
     return min_node;
 }
 
+// leaf_label is an output: average of y-value among [start, end)
+template <class T>
+bool stop_splitting_ordinal_int(Matrix & dataset, vector<size_t>::iterator start, vector<size_t>::iterator end,
+                    TreeConfig & treeConfig, T & leaf_label) { // checking whether all Y_values are same
+    Column* Y = dataset.get_column(y_index);
+
+    double average = 0.0;
+
+    for(auto it = start; it != end; it++) {
+        T value;
+        Y->get(*it, &value);
+        average += value;
+    }
+
+    average = average / (end - start);
+    leaf_label = average + 0.5;
+
+    bool min_node = ((end - start) <= treeConfig.MIN_SAMPLE_LEAF); //whether node is too small to split
+    return min_node;
+}
+
 template <class T>
 TreeNode* create_leaf(vector<size_t>::iterator start, vector<size_t>::iterator end, T label)
 {
@@ -377,7 +398,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
     if(Y->is_ordinal) {
         if(ytype == ELEM_SHORT) {
             short label;
-            stop = stop_splitting_ordinal<short>(*(task->matrix), start, end, treeConfig, label);
+            stop = stop_splitting_ordinal_int<short>(*(task->matrix), start, end, treeConfig, label);
             if(stop || end_of_path) {
                 TreeNode* node = create_leaf<short>(start, end, label);
                 return node;
@@ -385,7 +406,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
             node_label = to_string(label);
         } else if(ytype == ELEM_INT) {
             int label;
-            stop = stop_splitting_ordinal<int>(*(task->matrix), start, end, treeConfig, label);
+            stop = stop_splitting_ordinal_int<int>(*(task->matrix), start, end, treeConfig, label);
             if(stop || end_of_path) {
                 TreeNode* node = create_leaf<int>(start, end, label);
                 return node;
@@ -603,7 +624,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
     if(Y->is_ordinal) {
         if(ytype == ELEM_SHORT) {
             short label;
-            stop = stop_splitting_ordinal<short>(*(task->matrix), start, end, treeConfig, label);
+            stop = stop_splitting_ordinal_int<short>(*(task->matrix), start, end, treeConfig, label);
             if(stop || end_of_path) {
                 TreeNode* node = create_leaf<short>(start, end, label);
                 return node;
@@ -611,7 +632,7 @@ TreeNode* build_tree(Task_Slave_Subtree* task, vector<size_t>::iterator start, v
             node_label = to_string(label);
         } else if(ytype == ELEM_INT) {
             int label;
-            stop = stop_splitting_ordinal<int>(*(task->matrix), start, end, treeConfig, label);
+            stop = stop_splitting_ordinal_int<int>(*(task->matrix), start, end, treeConfig, label);
             if(stop || end_of_path) {
                 TreeNode* node = create_leaf<int>(start, end, label);
                 return node;
