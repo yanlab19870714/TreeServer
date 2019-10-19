@@ -462,7 +462,7 @@ public:
 		cout << "MASTER_END, All result found here, Now would send end plan, file = "
 			 << __FILE__ << ", Line = " << __LINE__ << endl;
 
-		send_end_plan();
+		send_end_plan(planQueue);
 
 	}
 
