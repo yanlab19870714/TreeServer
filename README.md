@@ -10,7 +10,7 @@ We additionally require you to install the Boost C++ library. You may need to up
 ### Contact
 Da Yan: http://www.cs.uab.edu/yanda
 
-UAB Data Lab (or YanLab@UAB): http://vorlon.cs.uab.edu/bigdata
+Video Demo: https://www.youtube.com/watch?v=4DnLv_OFlIg
 
 Email: yanda@uab.edu
 
