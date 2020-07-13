@@ -8,7 +8,7 @@ Please follow the documentation here to deploy: https://yanlab19870714.github.io
 We additionally require you to install the Boost C++ library. You may need to update the Makefiles to run on your platform.
 
 ### Contact
-Da Yan: http://www.cs.uab.edu/yanda
+Da Yan: https://yanlab19870714.github.io/yanda
 
 Video Demo: https://www.youtube.com/watch?v=4DnLv_OFlIg
 
